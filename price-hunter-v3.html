@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מחפש מחיר - שוק ישראלי</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f3ee;
+  --surface: #ffffff;
+  --surface2: #f0ede6;
+  --border: #ddd9d0;
+  --text: #1a1a18;
+  --text2: #6b6860;
+  --text3: #9e9b94;
+  --accent: #2d6a4f;
+  --accent-light: #e8f4f0;
+  --accent-border: #a8d5c2;
+  --warn: #b5451b;
+  --warn-light: #fdf0ec;
+  --gold: #c9921a;
+  --gold-light: #fef7e6;
+  --info: #1a5fa8;
+  --info-light: #e8f0fb;
+  --purple: #6b3fa0;
+  --purple-light: #f2ecfa;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Heebo', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; direction: rtl; }
+.page { max-width: 700px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
+
+/* Header */
+.header { text-align: center; margin-bottom: 1.75rem; }
+.header-icon { width: 52px; height: 52px; background: var(--accent); border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.75rem; font-size: 24px; }
+.header h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 4px; }
+.header p { font-size: 13px; color: var(--text2); font-weight: 300; }
+
+/* API Key */
+.setup-card { background: var(--gold-light); border: 1px solid #e8d5a0; border-radius: 14px; padding: 1rem 1.25rem; margin-bottom: 1.25rem; }
+.setup-title { font-size: 13px; font-weight: 500; color: var(--gold); margin-bottom: 8px; }
+.setup-row { display: flex; gap: 8px; }
+.setup-row input { flex: 1; height: 36px; border: 1px solid #e0cc8a; border-radius: 8px; padding: 0 10px; font-size: 13px; font-family: monospace; background: #fff; color: var(--text); direction: ltr; }
+.setup-row input:focus { outline: none; border-color: var(--gold); }
+.btn-save { height: 36px; padding: 0 14px; background: var(--gold); color: #fff; border: none; border-radius: 8px; font-size: 13px; font-family: 'Heebo', sans-serif; cursor: pointer; font-weight: 500; }
+.btn-save:hover { background: #a87a12; }
+.key-status { font-size: 11px; color: var(--text3); margin-top: 5px; }
+.key-status.ok { color: var(--accent); }
+
+/* Tabs */
+.tabs { display: flex; gap: 3px; background: var(--surface2); border-radius: 12px; padding: 4px; margin-bottom: 1.25rem; }
+.tab { flex: 1; text-align: center; padding: 8px 4px; font-size: 13px; font-weight: 500; cursor: pointer; border-radius: 9px; color: var(--text2); transition: all 0.2s; border: none; background: none; font-family: 'Heebo', sans-serif; }
+.tab.active { background: var(--surface); color: var(--accent); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+
+/* Cards */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.25rem; margin-bottom: 1rem; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
+.card-label { font-size: 13px; font-weight: 500; color: var(--text2); margin-bottom: 8px; }
+
+/* Search single */
+.search-row { display: flex; gap: 8px; margin-bottom: 12px; }
+.search-row input { flex: 1; height: 44px; border: 1px solid var(--border); border-radius: 10px; padding: 0 14px; font-size: 15px; font-family: 'Heebo', sans-serif; background: var(--bg); color: var(--text); direction: rtl; }
+.search-row input:focus { outline: none; border-color: var(--accent); background: #fff; }
+.btn-green { height: 44px; padding: 0 20px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-size: 15px; font-family: 'Heebo', sans-serif; font-weight: 500; cursor: pointer; white-space: nowrap; transition: background 0.2s, transform 0.1s; }
+.btn-green:hover { background: #235a40; }
+.btn-green:active { transform: scale(0.97); }
+.btn-green:disabled { background: var(--text3); cursor: not-allowed; transform: none; }
+
+/* Chips */
+.chips-label { font-size: 11px; color: var(--text3); margin-bottom: 6px; }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip { font-size: 12px; font-family: 'Heebo', sans-serif; padding: 4px 11px; border: 1px solid var(--border); border-radius: 20px; cursor: pointer; color: var(--text2); background: var(--surface2); transition: all 0.15s; }
+.chip:hover { background: var(--accent-light); border-color: var(--accent-border); color: var(--accent); }
+
+/* Basket */
+.basket-input-row { display: flex; gap: 8px; margin-bottom: 10px; }
+.basket-input-row input { flex: 1; height: 40px; border: 1px solid var(--border); border-radius: 9px; padding: 0 12px; font-size: 14px; font-family: 'Heebo', sans-serif; background: var(--bg); color: var(--text); direction: rtl; }
+.basket-input-row input:focus { outline: none; border-color: var(--accent); background: #fff; }
+.btn-add { height: 40px; padding: 0 16px; background: var(--surface2); color: var(--text); border: 1px solid var(--border); border-radius: 9px; font-size: 14px; font-family: 'Heebo', sans-serif; cursor: pointer; }
+.btn-add:hover { background: var(--accent-light); border-color: var(--accent-border); color: var(--accent); }
+.basket-list { margin-bottom: 12px; min-height: 44px; }
+.basket-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--surface2); border-radius: 8px; margin-bottom: 5px; font-size: 14px; }
+.basket-item-name { flex: 1; }
+.basket-remove { background: none; border: none; cursor: pointer; color: var(--text3); font-size: 16px; padding: 0 4px; font-family: 'Heebo', sans-serif; }
+.basket-remove:hover { color: var(--warn); }
+.basket-empty { font-size: 13px; color: var(--text3); text-align: center; padding: 12px 0; }
+.basket-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.basket-actions .btn-green { flex: 1; height: 44px; }
+.btn-outline { height: 44px; padding: 0 14px; background: none; border: 1px solid var(--border); border-radius: 10px; font-size: 13px; font-family: 'Heebo', sans-serif; cursor: pointer; color: var(--text2); }
+.btn-outline:hover { background: var(--warn-light); border-color: #f0b8a0; color: var(--warn); }
+
+/* Upload tab */
+.upload-zone { border: 2px dashed var(--border); border-radius: 14px; padding: 2rem 1.25rem; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 1rem; background: var(--bg); }
+.upload-zone:hover, .upload-zone.drag { border-color: var(--accent); background: var(--accent-light); }
+.upload-icon { font-size: 36px; margin-bottom: 10px; }
+.upload-title { font-size: 15px; font-weight: 500; margin-bottom: 6px; }
+.upload-sub { font-size: 13px; color: var(--text2); margin-bottom: 14px; }
+.upload-types { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.type-badge { font-size: 12px; padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border); color: var(--text2); background: var(--surface); }
+input[type="file"] { display: none; }
+
+.preview-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1rem; display: none; }
+.preview-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.preview-filename { font-size: 14px; font-weight: 500; }
+.btn-remove-file { background: none; border: none; cursor: pointer; color: var(--text3); font-size: 20px; padding: 0; }
+.btn-remove-file:hover { color: var(--warn); }
+.preview-img { max-width: 100%; max-height: 200px; border-radius: 8px; display: block; margin: 0 auto 10px; }
+.preview-info { font-size: 12px; color: var(--text3); }
+
+.detect-mode { margin-bottom: 1rem; }
+.detect-label { font-size: 13px; color: var(--text2); margin-bottom: 8px; }
+.mode-btns { display: flex; gap: 8px; }
+.mode-btn { flex: 1; padding: 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface2); cursor: pointer; font-size: 13px; font-family: 'Heebo', sans-serif; color: var(--text2); text-align: center; transition: all 0.15s; }
+.mode-btn.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); font-weight: 500; }
+.mode-btn:hover { background: var(--accent-light); border-color: var(--accent-border); }
+
+/* Identified products */
+.identified-box { background: var(--purple-light); border: 1px solid #c9a8e8; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1rem; display: none; }
+.identified-title { font-size: 13px; font-weight: 500; color: var(--purple); margin-bottom: 10px; }
+.identified-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: #fff; border-radius: 8px; margin-bottom: 5px; font-size: 14px; border: 1px solid #ddd0f0; }
+.identified-item-name { flex: 1; }
+.identified-check { color: var(--accent); font-size: 16px; }
+.identified-actions { display: flex; gap: 8px; margin-top: 10px; }
+.btn-purple { flex: 1; height: 40px; background: var(--purple); color: #fff; border: none; border-radius: 9px; font-size: 14px; font-family: 'Heebo', sans-serif; font-weight: 500; cursor: pointer; }
+.btn-purple:hover { background: #562e85; }
+
+/* Status */
+.status-box { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1rem; display: none; align-items: center; gap: 12px; }
+.spinner { width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.status-text { font-size: 14px; color: var(--text2); }
+.err-box { background: var(--warn-light); border: 1px solid #f0b8a0; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1rem; font-size: 14px; color: var(--warn); display: none; }
+
+/* Results - single */
+.results-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; margin-bottom: 1rem; box-shadow: 0 2px 10px rgba(0,0,0,0.04); display: none; }
+.results-header { padding: 0.9rem 1.25rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--surface2); }
+.results-product { font-size: 15px; font-weight: 500; }
+.results-count { font-size: 12px; color: var(--text3); }
+.price-row { display: flex; align-items: center; gap: 10px; padding: 13px 1.25rem; border-bottom: 1px solid var(--border); transition: background 0.15s; }
+.price-row:last-of-type { border-bottom: none; }
+.price-row:hover { background: var(--bg); }
+.price-row.best { background: var(--accent-light); }
+.price-row.best:hover { background: #ddf0e8; }
+.rank-num { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; flex-shrink: 0; background: var(--surface2); color: var(--text3); border: 1px solid var(--border); }
+.rank-num.gold { background: var(--gold-light); color: var(--gold); border-color: #e8d5a0; font-size: 13px; }
+.row-info { flex: 1; min-width: 0; }
+.row-store { font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.badge-best { font-size: 10px; padding: 2px 7px; background: var(--accent); color: #fff; border-radius: 10px; font-weight: 400; }
+.badge-cheapest { font-size: 10px; padding: 2px 7px; background: var(--accent); color: #fff; border-radius: 10px; font-weight: 400; }
+.row-note { font-size: 12px; color: var(--text3); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row-price { text-align: left; flex-shrink: 0; }
+.price-main { font-size: 19px; font-weight: 700; letter-spacing: -0.5px; }
+.price-row.best .price-main { color: var(--accent); }
+.price-diff { font-size: 11px; color: var(--warn); text-align: left; margin-top: 1px; }
+.row-link { flex-shrink: 0; width: 30px; height: 30px; border-radius: 7px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; text-decoration: none; color: var(--text2); font-size: 13px; transition: all 0.15s; }
+.row-link:hover { background: var(--accent-light); border-color: var(--accent-border); color: var(--accent); }
+.summary-box { background: var(--surface2); border-top: 1px solid var(--border); padding: 1rem 1.25rem; font-size: 13px; color: var(--text2); line-height: 1.7; }
+
+/* Basket results */
+.basket-results { display: none; }
+.basket-product-section { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 10px; box-shadow: 0 1px 6px rgba(0,0,0,0.04); }
+.basket-product-header { padding: 10px 1.25rem; background: var(--surface2); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.basket-product-name { font-size: 14px; font-weight: 500; }
+.basket-product-best { font-size: 14px; font-weight: 700; color: var(--accent); }
+
+/* Recommendation */
+.rec-box { background: var(--info-light); border: 1px solid #b0ccee; border-radius: 14px; padding: 1.25rem; margin-bottom: 1rem; display: none; }
+.rec-title { font-size: 13px; font-weight: 500; color: var(--info); margin-bottom: 8px; }
+.rec-store { font-size: 22px; font-weight: 700; color: var(--info); margin-bottom: 6px; }
+.rec-total { font-size: 14px; color: var(--text2); margin-bottom: 4px; }
+.rec-savings { font-size: 13px; color: var(--accent); font-weight: 500; margin-bottom: 8px; }
+.rec-breakdown { font-size: 12px; color: var(--text2); line-height: 1.8; }
+.rec-summary { font-size: 13px; color: var(--text2); margin-top: 10px; line-height: 1.6; border-top: 1px solid #b0ccee; padding-top: 10px; }
+
+.unit-price-main { font-size: 19px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); }
+.unit-label { font-size: 12px; font-weight: 400; color: var(--text2); margin-right: 2px; }
+.pack-price { font-size: 11px; color: var(--text3); text-align: left; }
+.pack-desc { font-size: 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 1px 6px; color: var(--text2); }
+
+/* Multi-pack store rows */
+.price-row-store { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+.price-row-store:last-of-type { border-bottom: none; }
+.price-row-store.best { background: var(--accent-light); }
+.store-row-header { display: flex; align-items: center; gap: 10px; padding: 12px 1.25rem 6px; }
+.store-row-name { flex: 1; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.store-best-unit { font-size: 17px; font-weight: 700; letter-spacing: -0.5px; flex-shrink: 0; text-align: left; }
+.price-row-store.best .store-best-unit { color: var(--accent); }
+.unit-diff { font-size: 11px; color: var(--warn); font-weight: 400; display: block; text-align: left; }
+.packs-list { padding: 0 1.25rem 10px 1.25rem; margin-right: 36px; }
+.pack-row { display: flex; align-items: center; justify-content: space-between; padding: 5px 10px; border-radius: 7px; margin-bottom: 3px; background: var(--surface2); border: 1px solid var(--border); }
+.pack-row.pack-best { background: var(--gold-light); border-color: #e8d5a0; }
+.pack-row-desc { font-size: 13px; color: var(--text2); flex: 1; }
+.pack-row.pack-best .pack-row-desc { color: var(--text); font-weight: 500; }
+.pack-row-prices { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.pack-unit-p { font-size: 13px; font-weight: 500; color: var(--accent); }
+.pack-row.pack-best .pack-unit-p { color: var(--gold); }
+.pack-total-p { font-size: 12px; color: var(--text3); }
+.pack-link { font-size: 12px; color: var(--text3); text-decoration: none; padding: 2px 5px; border-radius: 5px; border: 1px solid var(--border); background: var(--surface); }
+.pack-link:hover { color: var(--accent); border-color: var(--accent-border); }
+.disclaimer { font-size: 11px; color: var(--text3); line-height: 1.6; margin-top: 0.5rem; }
+
+/* Quote box */
+.quote-box { background: var(--surface); border: 1.5px solid var(--accent-border); border-radius: 16px; overflow: hidden; margin-bottom: 1rem; box-shadow: 0 2px 12px rgba(45,106,79,0.08); display: none; }
+.quote-header { padding: 0.9rem 1.25rem; background: var(--accent-light); border-bottom: 1px solid var(--accent-border); display: flex; justify-content: space-between; align-items: center; }
+.quote-title { font-size: 14px; font-weight: 500; color: var(--accent); }
+.quote-date { font-size: 11px; color: var(--text3); }
+.quote-store-row { display: flex; align-items: center; gap: 10px; padding: 14px 1.25rem; border-bottom: 1px solid var(--border); transition: background 0.15s; }
+.quote-store-row:hover { background: var(--bg); }
+.quote-store-row.winner { background: var(--accent-light); }
+.quote-rank { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; background: var(--surface2); color: var(--text3); border: 1px solid var(--border); flex-shrink: 0; }
+.quote-rank.gold { background: var(--gold-light); color: var(--gold); border-color: #e8d5a0; font-size: 13px; }
+.quote-store-info { flex: 1; }
+.quote-store-name { font-size: 14px; font-weight: 500; }
+.quote-shipping-note { font-size: 12px; margin-top: 2px; }
+.shipping-free { color: var(--accent); }
+.shipping-paid { color: var(--warn); }
+.shipping-unknown { color: var(--text3); }
+.quote-totals { text-align: left; flex-shrink: 0; }
+.quote-products-price { font-size: 13px; color: var(--text2); }
+.quote-shipping-price { font-size: 12px; margin-top: 1px; }
+.quote-grand-total { font-size: 19px; font-weight: 700; letter-spacing: -0.5px; margin-top: 2px; }
+.quote-store-row.winner .quote-grand-total { color: var(--accent); }
+.quote-savings-badge { font-size: 11px; padding: 2px 8px; background: var(--accent); color: #fff; border-radius: 10px; margin-top: 3px; display: inline-block; }
+.quote-footer { padding: 0.9rem 1.25rem; background: var(--surface2); border-top: 1px solid var(--border); font-size: 12px; color: var(--text2); line-height: 1.6; }
+.btn-quote { height: 40px; padding: 0 18px; background: var(--info-light); color: var(--info); border: 1px solid #b0ccee; border-radius: 9px; font-size: 13px; font-family: 'Heebo', sans-serif; font-weight: 500; cursor: pointer; white-space: nowrap; }
+.btn-quote:hover { background: #d0e4f8; }
+.btn-quote:disabled { opacity: 0.5; cursor: not-allowed; }
+.shipping-badge { font-size: 11px; padding: 1px 7px; border-radius: 10px; margin-right: 4px; }
+.shipping-badge.free { background: var(--accent-light); color: var(--accent); border: 1px solid var(--accent-border); }
+.shipping-badge.paid { background: var(--warn-light); color: var(--warn); border: 1px solid #f0b8a0; }
+
+@media (max-width: 480px) {
+  .page { padding: 1rem 0.9rem 3rem; }
+  .header h1 { font-size: 20px; }
+  .tab { font-size: 12px; padding: 7px 2px; }
+  .price-main { font-size: 16px; }
+  .row-link { display: none; }
+  .rec-store { font-size: 18px; }
+  .mode-btns { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="header-icon">🔍</div>
+    <h1>מחפש מחיר - שוק ישראלי</h1>
+    <p>השוואת מחירים בזמן אמת - תוספי תזונה, מכשירי בריאות ועוד</p>
+  </div>
+
+  <!-- API Key -->
+  <div class="setup-card">
+    <div class="setup-title">🔑 מפתח API (Anthropic)</div>
+    <div class="setup-row">
+      <input type="password" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off" />
+      <button class="btn-save" onclick="saveKey()">שמור</button>
+    </div>
+    <div class="key-status" id="keyStatus">לא הוזן מפתח</div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" id="tab-single" onclick="switchTab('single')">🔎 מוצר בודד</button>
+    <button class="tab" id="tab-basket" onclick="switchTab('basket')">🛒 סל מוצרים</button>
+    <button class="tab" id="tab-upload" onclick="switchTab('upload')">📄 העלה קובץ</button>
+  </div>
+
+  <!-- SINGLE MODE -->
+  <div id="mode-single">
+    <div class="card">
+      <div class="card-label">חיפוש מוצר</div>
+      <div class="search-row">
+        <input type="text" id="query" placeholder="לדוגמה: קו-אנזים Q10 60 מ&quot;ג 180 כמוסות" />
+        <button class="btn-green" id="searchBtn" onclick="doSingleSearch()">חפש</button>
+      </div>
+      <div class="chips-label">חיפושים מהירים:</div>
+      <div class="chips">
+        <span class="chip" onclick="setQ('קו-אנזים Q10 60 מג סופהרב 180 כמוסות')">קו-אנזים Q10</span>
+        <span class="chip" onclick="setQ('מגנזיום קרבונט אמורפי 60 קפסולות')">מגנזיום קרבונט</span>
+        <span class="chip" onclick="setQ('תמצית זרעי ענבים 250 מג 60 כמוסות')">תמצית זרעי ענבים</span>
+        <span class="chip" onclick="setQ('סו פלמנטו קומפלקס גברים 120 כמוסות')">סו פלמנטו</span>
+        <span class="chip" onclick="setQ('פיליפס סוניקר שטיפת פה HX3826')">Philips HX3826</span>
+        <span class="chip" onclick="setQ('ויטמין D3 1000 יחב&quot;ל')">ויטמין D3</span>
+        <span class="chip" onclick="setQ('אומגה 3 דגים 1000 מג')">אומגה 3</span>
+      </div>
+    </div>
+    <div class="status-box" id="statusSingle"><div class="spinner"></div><div class="status-text" id="statusSingleText"></div></div>
+    <div class="err-box" id="errSingle"></div>
+    <div class="results-card" id="resultsCard">
+      <div class="results-header">
+        <span class="results-product" id="resultsProduct"></span>
+        <span class="results-count" id="resultsCount"></span>
+      </div>
+      <div id="resultsList"></div>
+      <div class="summary-box" id="summaryBox" style="display:none;"></div>
+    </div>
+  </div>
+
+  <!-- BASKET MODE -->
+  <div id="mode-basket" style="display:none;">
+    <div class="card">
+      <div class="card-label">הוסף מוצרים לסל</div>
+      <div class="basket-input-row">
+        <input type="text" id="basketInput" placeholder="שם מוצר..." />
+        <button class="btn-add" onclick="addToBasket()">+ הוסף</button>
+      </div>
+      <div class="basket-list" id="basketList">
+        <div class="basket-empty" id="basketEmpty">הסל ריק - הוסף מוצרים</div>
+      </div>
+      <div class="basket-actions">
+        <button class="btn-green" id="basketSearchBtn" onclick="doBasketSearch()">חפש מחירים לכל הסל</button>
+        <button class="btn-quote" id="basketQuoteBtn" onclick="showQuote()" style="display:none;">📋 הצעת מחיר</button>
+        <button class="btn-outline" onclick="clearBasket()">נקה סל</button>
+      </div>
+      <div class="chips-label" style="margin-top:10px;">טעינה מהירה:</div>
+      <div class="chips">
+        <span class="chip" onclick="loadPreset()">📋 רשימת התוספים שלי</span>
+      </div>
+    </div>
+    <div class="status-box" id="statusBasket"><div class="spinner"></div><div class="status-text" id="statusBasketText"></div></div>
+    <div class="err-box" id="errBasket"></div>
+    <div class="rec-box" id="recBox">
+      <div class="rec-title">המלצה - חנות אחת לכל הסל</div>
+      <div class="rec-store" id="recStore"></div>
+      <div class="rec-total" id="recTotal"></div>
+      <div class="rec-savings" id="recSavings"></div>
+      <div class="rec-breakdown" id="recBreakdown"></div>
+      <div class="rec-summary" id="recSummary"></div>
+    </div>
+    <div class="basket-results" id="basketResults"></div>
+    <div class="quote-box" id="quoteBox">
+      <div class="quote-header">
+        <span class="quote-title">📋 הצעת מחיר לסל - השוואה כוללת משלוח</span>
+        <span class="quote-date" id="quoteDate"></span>
+      </div>
+      <div id="quoteStoreList"></div>
+      <div class="quote-footer" id="quoteFooter"></div>
+    </div>
+  </div>
+
+  <!-- UPLOAD MODE -->
+  <div id="mode-upload" style="display:none;">
+    <div class="card">
+      <div class="card-label">העלה חשבונית PDF או תמונת מוצר</div>
+
+      <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()" ondragover="onDrag(event,true)" ondragleave="onDrag(event,false)" ondrop="onDrop(event)">
+        <div class="upload-icon">📂</div>
+        <div class="upload-title">לחץ להעלאה או גרור קובץ לכאן</div>
+        <div class="upload-sub">PDF של חשבונית - לזיהוי אוטומטי של מוצרים<br>תמונת מוצר - לזיהוי ומציאת מחיר</div>
+        <div class="upload-types">
+          <span class="type-badge">PDF</span>
+          <span class="type-badge">JPG</span>
+          <span class="type-badge">PNG</span>
+          <span class="type-badge">WEBP</span>
+        </div>
+      </div>
+      <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png,.webp" onchange="onFileSelected(event)" />
+
+      <!-- Preview -->
+      <div class="preview-box" id="previewBox">
+        <div class="preview-header">
+          <span class="preview-filename" id="previewFilename"></span>
+          <button class="btn-remove-file" onclick="clearFile()">×</button>
+        </div>
+        <img id="previewImg" class="preview-img" style="display:none;" />
+        <div class="preview-info" id="previewInfo"></div>
+      </div>
+
+      <!-- Mode selection -->
+      <div class="detect-mode" id="detectMode" style="display:none;">
+        <div class="detect-label">מה לעשות עם הקובץ?</div>
+        <div class="mode-btns">
+          <button class="mode-btn selected" id="modeInvoice" onclick="selectMode('invoice')">
+            🧾 חשבונית - זהה מוצרים וחפש מחירים לסל
+          </button>
+          <button class="mode-btn" id="modeProduct" onclick="selectMode('product')">
+            📦 תמונת מוצר - זהה וחפש מחיר
+          </button>
+        </div>
+      </div>
+
+      <button class="btn-green" id="analyzeBtn" onclick="analyzeFile()" style="display:none; width:100%; margin-top:4px;">זהה וחפש</button>
+    </div>
+
+    <div class="status-box" id="statusUpload"><div class="spinner"></div><div class="status-text" id="statusUploadText"></div></div>
+    <div class="err-box" id="errUpload"></div>
+
+    <!-- Identified products from upload -->
+    <div class="identified-box" id="identifiedBox">
+      <div class="identified-title" id="identifiedTitle">מוצרים שזוהו בקובץ:</div>
+      <div id="identifiedList"></div>
+      <div class="identified-actions">
+        <button class="btn-purple" id="searchIdentifiedBtn" onclick="searchIdentified()">חפש מחירים לכל המוצרים</button>
+      </div>
+    </div>
+
+    <!-- Results from upload - reuse basket results structure -->
+    <div class="rec-box" id="recBoxUpload">
+      <div class="rec-title">המלצה - חנות אחת לכל הסל</div>
+      <div class="rec-store" id="recStoreUpload"></div>
+      <div class="rec-total" id="recTotalUpload"></div>
+      <div class="rec-savings" id="recSavingsUpload"></div>
+      <div class="rec-breakdown" id="recBreakdownUpload"></div>
+      <div class="rec-summary" id="recSummaryUpload"></div>
+    </div>
+    <div class="basket-results" id="uploadResults"></div>
+  </div>
+
+  <p class="disclaimer">* הסוכן מחפש בזמן אמת. המחירים עשויים להשתנות - תמיד בדוק לפני רכישה. עלות: ~$0.005 לחיפוש עם קובץ.</p>
+</div>
+
+<script>
+// ---- PROMPTS ----
+const SYSTEM_SINGLE = `אתה סוכן השוואת מחירים לשוק הישראלי. חפש בחנויות: ויטמין זול (vitaminzol.co.il), גוד פארם (goodpharm.co.il), בית צח (beit-tzach.co.il), סופר-פארם (super-pharm.co.il), iHerb (iherb.com), Google Shopping ישראל.
+חשוב לתוספי תזונה: עבור כל חנות - הצג את כל האריזות הזמינות (קטנה, בינונית, גדולה, מארז). לכל אריזה חשב מחיר ליחידה.
+השב אך ורק ב-JSON תקני בלי markdown:
+{"product_he":"שם המוצר","unit_type":"כמוסה","results":[{"store":"שם חנות","packs":[{"price":72.90,"units":60,"unit_price":1.22,"pack_desc":"60 כמוסות","url":"https://..."},{"price":135.00,"units":180,"unit_price":0.75,"pack_desc":"180 כמוסות (3 x 60)","url":"https://..."}]}],"summary":"2-3 משפטים בעברית - כולל המלצה לפי מחיר ליחידה"}
+עבור כל חנות - הצג את כל האריזות שמצאת (לפחות 1, עד 4). מיין packs לפי unit_price. מיין results לפי unit_price הנמוך ביותר בחנות. אל תמציא מחיר. summary בעברית.`
+
+const SYSTEM_BASKET = `אתה סוכן השוואת מחירים לשוק הישראלי. תקבל רשימת מוצרים - חפש מחיר לכל אחד.
+חנויות: ויטמין זול, גוד פארם, בית צח, סופר-פארם, iHerb, Google Shopping ישראל.
+לכל חנות חפש גם מדיניות משלוח (חינם מעל כמה, או עלות קבועה).
+עבור תוספי תזונה - לכל חנות הצג את כל האריזות הזמינות (קטנה, גדולה, מארז). לכל אריזה חשב מחיר ליחידה.
+השב אך ורק ב-JSON תקני:
+{"products":[{"query":"שם שחיפשת","product_he":"שם מדויק","unit_type":"כמוסה","results":[{"store":"חנות","shipping":"חינם מעל 199","packs":[{"price":72.90,"units":60,"unit_price":1.22,"pack_desc":"60 כמוסות","url":"https://..."},{"price":135.00,"units":180,"unit_price":0.75,"pack_desc":"מארז 3x60","url":"https://..."}]}]}],"stores_shipping":{"ויטמין זול":"חינם מעל 199","גוד פארם":"25 שח משלוח"},"recommendation":{"store":"חנות מומלצת","total_products":450.00,"shipping_cost":0,"total_with_shipping":450.00,"shipping_note":"חינם כי סל מעל 199","savings_vs_expensive":120.00,"breakdown":[{"product":"שם","price":129.90,"pack_desc":"180 כמוסות"}],"summary":"2-3 משפטים בעברית - כולל מחיר ליחידה"}}
+מיין packs לפי unit_price. מיין results לפי unit_price הנמוך ביותר. הכל בעברית.`
+
+const SYSTEM_IDENTIFY_INVOICE = `אתה מנתח חשבוניות קניה. קבל PDF או תמונה של חשבונית וחלץ את רשימת המוצרים שנרכשו.
+השב אך ורק ב-JSON תקני בלי markdown:
+{"products":["שם מוצר 1","שם מוצר 2"],"store_name":"שם החנות שממנה נרכש","purchase_date":"תאריך אם נמצא"}
+כלול רק שמות מוצרים ברורים, בלי מחירים, בלי כמויות. אם זו לא חשבונית - החזר {"error":"לא נמצאה חשבונית"}.`;
+
+const SYSTEM_IDENTIFY_PRODUCT = `אתה מזהה מוצרים מתמונות. קבל תמונת מוצר וזהה אותו.
+השב אך ורק ב-JSON תקני בלי markdown:
+{"product_he":"שם המוצר בעברית","product_en":"שם באנגלית","brand":"מותג","model":"מודל אם יש","search_query":"מחרוזת חיפוש מיטבית לחיפוש מחיר בישראל"}
+אם לא ניתן לזהות - החזר {"error":"לא ניתן לזהות את המוצר"}.`;
+
+// ---- KEY MANAGEMENT ----
+function saveKey() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if (!key.startsWith('sk-ant-')) { setKeyStatus('מפתח לא תקין', false); return; }
+  localStorage.setItem('ph_apikey', key);
+  setKeyStatus('מפתח נשמר', true);
+  document.getElementById('apiKeyInput').value = '';
+  document.getElementById('apiKeyInput').placeholder = '***שמור***';
+}
+function getKey() { return localStorage.getItem('ph_apikey') || ''; }
+function setKeyStatus(msg, ok) {
+  const el = document.getElementById('keyStatus');
+  el.textContent = msg;
+  el.className = 'key-status' + (ok ? ' ok' : '');
+}
+window.onload = () => { if (getKey()) setKeyStatus('מפתח שמור', true); };
+
+// ---- TABS ----
+function switchTab(tab) {
+  ['single','basket','upload'].forEach(t => {
+    document.getElementById('mode-' + t).style.display = t === tab ? 'block' : 'none';
+    document.getElementById('tab-' + t).className = 'tab' + (t === tab ? ' active' : '');
+  });
+}
+
+// ---- SINGLE SEARCH ----
+function setQ(v) { document.getElementById('query').value = v; document.getElementById('query').focus(); }
+
+async function doSingleSearch() {
+  const q = document.getElementById('query').value.trim();
+  const key = getKey();
+  if (!q) { showErr('errSingle', 'הכנס שם מוצר'); return; }
+  if (!key) { showErr('errSingle', 'יש להזין מפתח API תחילה'); return; }
+  setBtn('searchBtn', true, 'מחפש...');
+  hideErr('errSingle');
+  document.getElementById('resultsCard').style.display = 'none';
+  showStatus('statusSingle', 'statusSingleText', 'הסוכן מחפש מחירים...');
+  try {
+    const parsed = await callClaude(key, SYSTEM_SINGLE, `חפש מחיר הכי זול בישראל: ${q}`, [], false);
+    if (!parsed.results?.length) throw new Error('לא נמצאו תוצאות.');
+    renderSingle(parsed, q);
+  } catch(e) { showErr('errSingle', e.message); }
+  hideStatus('statusSingle');
+  setBtn('searchBtn', false, 'חפש');
+}
+
+function renderSingle(parsed, q) {
+  const getBestUnitPrice = r => (r.packs && r.packs[0]?.unit_price) || r.unit_price || r.price || 999;
+  const sorted = [...parsed.results].sort((a,b) => getBestUnitPrice(a) - getBestUnitPrice(b));
+  const min = getBestUnitPrice(sorted[0]);
+  document.getElementById('resultsProduct').textContent = parsed.product_he || q;
+  document.getElementById('resultsCount').textContent = sorted.length + ' חנויות';
+  document.getElementById('resultsList').innerHTML = sorted.map((r, i) => priceRowHtml(r, i, min, i === 0)).join('');
+  const sb = document.getElementById('summaryBox');
+  if (parsed.summary) { sb.textContent = parsed.summary; sb.style.display = 'block'; } else { sb.style.display = 'none'; }
+  document.getElementById('resultsCard').style.display = 'block';
+}
+
+// ---- BASKET ----
+let basket = [];
+
+function addToBasket() {
+  const input = document.getElementById('basketInput');
+  const val = input.value.trim();
+  if (!val) return;
+  basket.push(val);
+  input.value = '';
+  input.focus();
+  renderBasketList();
+}
+function removeFromBasket(i) { basket.splice(i, 1); renderBasketList(); }
+function clearBasket() {
+  basket = [];
+  renderBasketList();
+  document.getElementById('basketResults').style.display = 'none';
+  document.getElementById('recBox').style.display = 'none';
+}
+function loadPreset() {
+  basket = ['קו-אנזים Q10 60 מג סופהרב 180 כמוסות','מגנזיום קרבונט אמורפי 60 קפסולות','תמצית זרעי ענבים 250 מג 60 כמוסות','סו פלמנטו קומפלקס גברים 120 כמוסות'];
+  renderBasketList();
+}
+function renderBasketList() {
+  const el = document.getElementById('basketList');
+  if (!basket.length) {
+    el.innerHTML = '<div class="basket-empty">הסל ריק - הוסף מוצרים</div>';
+    return;
+  }
+  el.innerHTML = basket.map((item, i) => `<div class="basket-item"><span class="basket-item-name">${esc(item)}</span><button class="basket-remove" onclick="removeFromBasket(${i})">×</button></div>`).join('');
+}
+
+async function doBasketSearch() {
+  if (!basket.length) { showErr('errBasket', 'הסל ריק'); return; }
+  const key = getKey();
+  if (!key) { showErr('errBasket', 'יש להזין מפתח API'); return; }
+  setBtn('basketSearchBtn', true, 'מחפש...');
+  hideErr('errBasket');
+  document.getElementById('basketResults').style.display = 'none';
+  document.getElementById('recBox').style.display = 'none';
+  try {
+    const allProducts = [];
+    for (let i = 0; i < basket.length; i++) {
+      const prod = basket[i];
+      showStatus('statusBasket', 'statusBasketText',
+        `מחפש ${i+1} מתוך ${basket.length}: ${prod.substring(0,25)}...`);
+      try {
+        const result = await callClaude(key, SYSTEM_SINGLE, `חפש מחיר הכי זול בישראל: ${prod}`, [], true);
+        allProducts.push({
+          query: prod,
+          product_he: result.product_he || prod,
+          unit_type: result.unit_type || '',
+          results: (result.results || []).map(r => ({ ...r, shipping: r.shipping || '' }))
+        });
+      } catch(e) {
+        allProducts.push({ query: prod, product_he: prod, results: [], error: e.message });
+      }
+    }
+    if (!allProducts.length) throw new Error('לא נמצאו תוצאות.');
+    const combined = { products: allProducts, recommendation: buildClientRecommendation(allProducts) };
+    renderBasketResults(combined,'recBox','recStore','recTotal','recSavings','recBreakdown','recSummary','basketResults');
+  } catch(e) { showErr('errBasket', e.message); }
+  hideStatus('statusBasket');
+  setBtn('basketSearchBtn', false, 'חפש מחירים לכל הסל');
+}
+
+// Global store for last basket results (for quote)
+let lastBasketParsed = null;
+
+function renderBasketResults(parsed, recId, storeId, totalId, savingsId, breakdownId, summaryId, listId) {
+  // Store for quote button
+  if (listId === 'basketResults') {
+    lastBasketParsed = parsed;
+    document.getElementById('basketQuoteBtn').style.display = 'inline-block';
+    document.getElementById('quoteBox').style.display = 'none';
+  }
+
+  const rec = parsed.recommendation;
+  if (rec) {
+    document.getElementById(storeId).textContent = rec.store;
+    const totalKey = rec.total_with_shipping != null ? rec.total_with_shipping : (rec.total || rec.total_products || 0);
+    document.getElementById(totalId).textContent = `סה"כ כולל משלוח: ₪${Number(totalKey).toFixed(2)}`;
+    if (rec.shipping_note) document.getElementById(totalId).textContent += ` (${rec.shipping_note})`;
+    document.getElementById(savingsId).textContent = rec.savings_vs_expensive > 0 ? `חיסכון לעומת הכי יקר: ₪${Number(rec.savings_vs_expensive).toFixed(2)}` : '';
+    document.getElementById(breakdownId).innerHTML = (rec.breakdown || []).map(b => `${esc(b.product)}: ₪${Number(b.price).toFixed(2)}`).join(' &nbsp;|&nbsp; ');
+    document.getElementById(summaryId).textContent = rec.summary || '';
+    document.getElementById(recId).style.display = 'block';
+  }
+
+  let html = '';
+  for (const prod of parsed.products) {
+    const getBU = r => (r.packs && r.packs[0]?.unit_price) || r.unit_price || r.price || 999;
+    const sorted = [...(prod.results || [])].sort((a,b) => getBU(a) - getBU(b));
+    const minU = getBU(sorted[0]);
+    const minPack = sorted[0]?.packs?.[0] || sorted[0];
+    const minDisplay = minPack?.unit_price > 0 ? `₪${Number(minPack.unit_price).toFixed(2)}/יח'` : (minPack?.price ? `₪${Number(minPack.price).toFixed(2)}` : '');
+    html += `<div class="basket-product-section"><div class="basket-product-header"><span class="basket-product-name">${esc(prod.product_he || prod.query)}</span>${minDisplay ? `<span class="basket-product-best">${minDisplay}</span>` : ''}</div>${sorted.map((r,i) => priceRowHtmlWithShipping(r, i, minU, i===0)).join('')}</div>`;
+  }
+  document.getElementById(listId).innerHTML = html;
+  document.getElementById(listId).style.display = 'block';
+}
+
+function priceRowHtmlWithShipping(r, i, minUnitPrice, isBest) {
+  const shipping = r.shipping || '';
+  const isFreeShip = shipping.includes('חינם');
+  const shippingHtml = shipping
+    ? `<span class="shipping-badge ${isFreeShip ? 'free' : 'paid'}">${esc(shipping)}</span> `
+    : '';
+
+  const packs = r.packs && r.packs.length ? r.packs : [{
+    price: r.price, units: r.units, unit_price: r.unit_price,
+    pack_desc: r.pack_desc, url: r.url
+  }];
+  const bestPack = packs[0];
+  const bestUnitPrice = bestPack.unit_price || 0;
+  const diff = (i > 0 && minUnitPrice > 0 && bestUnitPrice > 0)
+    ? (bestUnitPrice - minUnitPrice).toFixed(2) : null;
+
+  const packsHtml = packs.map((p, pi) => {
+    const url = p.url?.startsWith('http') ? p.url : '#';
+    return `<div class="pack-row ${pi===0?'pack-best':''}">
+      <div class="pack-row-desc">${esc(p.pack_desc || (p.units ? p.units + " יח'" : ''))}</div>
+      <div class="pack-row-prices">
+        ${p.unit_price > 0 ? `<span class="pack-unit-p">₪${Number(p.unit_price).toFixed(2)}/יח'</span>` : ''}
+        <span class="pack-total-p">₪${Number(p.price).toFixed(2)}</span>
+        <a class="pack-link" href="${url}" target="_blank" rel="noopener">↗</a>
+      </div>
+    </div>`;
+  }).join('');
+
+  return `<div class="price-row-store ${isBest ? 'best' : ''}">
+    <div class="store-row-header">
+      <div class="rank-num ${isBest ? 'gold' : ''}">${isBest ? '★' : i+1}</div>
+      <div class="store-row-name">
+        ${isBest ? '<span class="badge-cheapest">הזול ליחידה</span>' : ''}
+        ${esc(r.store)}
+        ${shippingHtml}
+      </div>
+      <div class="store-best-unit">
+        ${bestUnitPrice > 0 ? `₪${Number(bestUnitPrice).toFixed(2)}/יח'` : `₪${Number(bestPack.price).toFixed(2)}`}
+        ${diff ? `<span class="unit-diff">+₪${diff}</span>` : ''}
+      </div>
+    </div>
+    <div class="packs-list">${packsHtml}</div>
+  </div>`;
+}
+
+
+function showQuote() {
+  if (!lastBasketParsed) return;
+  const parsed = lastBasketParsed;
+  const storesShipping = parsed.stores_shipping || {};
+
+  // Build per-store totals
+  const storeTotals = {};
+  for (const prod of (parsed.products || [])) {
+    for (const r of (prod.results || [])) {
+      if (!storeTotals[r.store]) storeTotals[r.store] = { products: 0, items: [], shipping: r.shipping || storesShipping[r.store] || '' };
+      storeTotals[r.store].products += Number(r.price);
+      storeTotals[r.store].items.push({ name: prod.product_he || prod.query, price: Number(r.price), url: r.url });
+    }
+  }
+
+  // Estimate shipping cost per store
+  const storeRows = Object.entries(storeTotals).map(([store, data]) => {
+    const prodTotal = data.products;
+    const shippingStr = data.shipping || '';
+    let shippingCost = 0;
+    let shippingLabel = '';
+    let isFree = false;
+
+    if (shippingStr.includes('חינם תמיד') || shippingStr === 'חינם') {
+      shippingCost = 0; isFree = true; shippingLabel = 'משלוח חינם';
+    } else {
+      // Extract threshold number
+      const threshMatch = shippingStr.match(/חינם.*?(\d+)/);
+      const paidMatch = shippingStr.match(/(\d+).*?משלוח|משלוח.*?(\d+)/);
+      if (threshMatch) {
+        const thresh = Number(threshMatch[1]);
+        if (prodTotal >= thresh) { shippingCost = 0; isFree = true; shippingLabel = `משלוח חינם (מעל ₪${thresh})`; }
+        else { shippingCost = paidMatch ? Number(paidMatch[1]||paidMatch[2]||25) : 25; shippingLabel = `₪${shippingCost} משלוח (סף ₪${thresh})`; }
+      } else if (paidMatch) {
+        shippingCost = Number(paidMatch[1]||paidMatch[2]||25);
+        shippingLabel = `₪${shippingCost} משלוח`;
+      } else if (shippingStr) {
+        shippingLabel = shippingStr;
+      } else {
+        shippingLabel = 'משלוח - לא ידוע';
+      }
+    }
+
+    return { store, prodTotal, shippingCost, grandTotal: prodTotal + shippingCost, shippingLabel, isFree, items: data.items };
+  }).sort((a,b) => a.grandTotal - b.grandTotal);
+
+  if (!storeRows.length) return;
+  const cheapest = storeRows[0].grandTotal;
+
+  let html = '';
+  storeRows.forEach((row, i) => {
+    const isWinner = i === 0;
+    const savings = i > 0 ? (row.grandTotal - cheapest).toFixed(2) : null;
+    html += `<div class="quote-store-row ${isWinner ? 'winner' : ''}">
+      <div class="quote-rank ${isWinner ? 'gold' : ''}">${isWinner ? '★' : i+1}</div>
+      <div class="quote-store-info">
+        <div class="quote-store-name">${isWinner ? '<span class="badge-cheapest">הכי זול</span> ' : ''}${esc(row.store)}</div>
+        <div class="quote-shipping-note ${row.isFree ? 'shipping-free' : (row.shippingCost>0?'shipping-paid':'shipping-unknown')}">${esc(row.shippingLabel)}</div>
+      </div>
+      <div class="quote-totals">
+        <div class="quote-products-price">מוצרים: ₪${row.prodTotal.toFixed(2)}</div>
+        ${row.shippingCost > 0 ? `<div class="quote-shipping-price shipping-paid">+ ₪${row.shippingCost.toFixed(2)} משלוח</div>` : ''}
+        <div class="quote-grand-total">₪${row.grandTotal.toFixed(2)}</div>
+        ${savings ? `<span class="quote-savings-badge">+₪${savings}</span>` : ''}
+      </div>
+    </div>`;
+  });
+
+  document.getElementById('quoteStoreList').innerHTML = html;
+  document.getElementById('quoteDate').textContent = new Date().toLocaleDateString('he-IL');
+  document.getElementById('quoteFooter').textContent = `* מחירי משלוח משוערים - ייתכנו שינויים. מומלץ לאמת באתר החנות לפני רכישה.`;
+  document.getElementById('quoteBox').style.display = 'block';
+  document.getElementById('quoteBox').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ---- UPLOAD ----
+let uploadedFile = null;
+let uploadMode = 'invoice';
+let identifiedProducts = [];
+
+function selectMode(mode) {
+  uploadMode = mode;
+  document.getElementById('modeInvoice').className = 'mode-btn' + (mode === 'invoice' ? ' selected' : '');
+  document.getElementById('modeProduct').className = 'mode-btn' + (mode === 'product' ? ' selected' : '');
+}
+
+function onDrag(e, over) {
+  e.preventDefault();
+  document.getElementById('uploadZone').className = 'upload-zone' + (over ? ' drag' : '');
+}
+
+function onDrop(e) {
+  e.preventDefault();
+  document.getElementById('uploadZone').className = 'upload-zone';
+  const file = e.dataTransfer.files[0];
+  if (file) handleFile(file);
+}
+
+function onFileSelected(e) {
+  const file = e.target.files[0];
+  if (file) handleFile(file);
+}
+
+function handleFile(file) {
+  const allowed = ['application/pdf','image/jpeg','image/png','image/webp','image/jpg'];
+  if (!allowed.includes(file.type)) { showErr('errUpload', 'סוג קובץ לא נתמך. השתמש ב-PDF, JPG, PNG או WEBP'); return; }
+  if (file.size > 20 * 1024 * 1024) { showErr('errUpload', 'הקובץ גדול מדי - מקסימום 20MB'); return; }
+  uploadedFile = file;
+  hideErr('errUpload');
+  document.getElementById('identifiedBox').style.display = 'none';
+  document.getElementById('recBoxUpload').style.display = 'none';
+  document.getElementById('uploadResults').style.display = 'none';
+
+  const preview = document.getElementById('previewBox');
+  document.getElementById('previewFilename').textContent = file.name;
+  document.getElementById('previewInfo').textContent = (file.size / 1024).toFixed(0) + ' KB - ' + (file.type === 'application/pdf' ? 'PDF' : 'תמונה');
+
+  const img = document.getElementById('previewImg');
+  if (file.type.startsWith('image/')) {
+    const reader = new FileReader();
+    reader.onload = e => { img.src = e.target.result; img.style.display = 'block'; };
+    reader.readAsDataURL(file);
+    // Auto-select product mode for images
+    selectMode('product');
+  } else {
+    img.style.display = 'none';
+    selectMode('invoice');
+  }
+
+  preview.style.display = 'block';
+  document.getElementById('detectMode').style.display = 'block';
+  document.getElementById('analyzeBtn').style.display = 'block';
+}
+
+function clearFile() {
+  uploadedFile = null;
+  document.getElementById('previewBox').style.display = 'none';
+  document.getElementById('detectMode').style.display = 'none';
+  document.getElementById('analyzeBtn').style.display = 'none';
+  document.getElementById('fileInput').value = '';
+  document.getElementById('identifiedBox').style.display = 'none';
+  document.getElementById('recBoxUpload').style.display = 'none';
+  document.getElementById('uploadResults').style.display = 'none';
+  hideErr('errUpload');
+}
+
+async function analyzeFile() {
+  if (!uploadedFile) return;
+  const key = getKey();
+  if (!key) { showErr('errUpload', 'יש להזין מפתח API תחילה'); return; }
+
+  setBtn('analyzeBtn', true, 'מנתח...');
+  hideErr('errUpload');
+  document.getElementById('identifiedBox').style.display = 'none';
+  showStatus('statusUpload', 'statusUploadText', uploadMode === 'invoice' ? 'מנתח חשבונית ומזהה מוצרים...' : 'מזהה מוצר מהתמונה...');
+
+  try {
+    const { base64, mediaType } = await fileToBase64(uploadedFile);
+    const isPdf = uploadedFile.type === 'application/pdf';
+    const system = uploadMode === 'invoice' ? SYSTEM_IDENTIFY_INVOICE : SYSTEM_IDENTIFY_PRODUCT;
+    const userText = uploadMode === 'invoice' ? 'זהה את המוצרים בחשבונית זו' : 'זהה את המוצר בתמונה זו';
+
+    const contentBlock = isPdf
+      ? { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } }
+      : { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } };
+
+    const parsed = await callClaude(key, system, userText, [contentBlock], false);
+
+    if (parsed.error) throw new Error(parsed.error);
+
+    if (uploadMode === 'invoice') {
+      if (!parsed.products?.length) throw new Error('לא זוהו מוצרים בחשבונית');
+      identifiedProducts = parsed.products;
+      showIdentified(parsed);
+    } else {
+      // product image - go straight to search
+      const searchQ = parsed.search_query || parsed.product_he || parsed.product_en;
+      if (!searchQ) throw new Error('לא ניתן לזהות את המוצר');
+      identifiedProducts = [searchQ];
+      showStatus('statusUpload', 'statusUploadText', `זוהה: ${parsed.product_he || parsed.product_en} - מחפש מחיר...`);
+      const priceResult = await callClaude(key, SYSTEM_SINGLE, `חפש מחיר הכי זול בישראל: ${searchQ}`, [], true);
+      hideStatus('statusUpload');
+      if (!priceResult.results?.length) throw new Error('לא נמצאו מחירים');
+      // Show in single tab style inside upload tab
+      showSingleInUpload(priceResult, parsed.product_he || searchQ);
+    }
+  } catch(e) { showErr('errUpload', e.message); }
+
+  hideStatus('statusUpload');
+  setBtn('analyzeBtn', false, 'זהה וחפש');
+}
+
+function showIdentified(parsed) {
+  const box = document.getElementById('identifiedBox');
+  document.getElementById('identifiedTitle').textContent =
+    `זוהו ${parsed.products.length} מוצרים${parsed.store_name ? ' מ' + parsed.store_name : ''}${parsed.purchase_date ? ' (' + parsed.purchase_date + ')' : ''}:`;
+  document.getElementById('identifiedList').innerHTML = parsed.products.map(p =>
+    `<div class="identified-item"><span class="identified-check">✓</span><span class="identified-item-name">${esc(p)}</span></div>`
+  ).join('');
+  box.style.display = 'block';
+}
+
+async function searchIdentified() {
+  if (!identifiedProducts.length) return;
+  const key = getKey();
+  if (!key) { showErr('errUpload', 'יש להזין מפתח API'); return; }
+  setBtn('searchIdentifiedBtn', true, 'מחפש...');
+  document.getElementById('recBoxUpload').style.display = 'none';
+  document.getElementById('uploadResults').style.display = 'none';
+  hideErr('errUpload');
+
+  // Search each product separately then combine
+  const allProducts = [];
+  for (let i = 0; i < identifiedProducts.length; i++) {
+    const prod = identifiedProducts[i];
+    showStatus('statusUpload', 'statusUploadText',
+      `מחפש מחיר ${i+1} מתוך ${identifiedProducts.length}: ${prod.substring(0,30)}...`);
+    try {
+      const result = await callClaude(key, SYSTEM_SINGLE, `חפש מחיר הכי זול בישראל: ${prod}`, [], true);
+      allProducts.push({
+        query: prod,
+        product_he: result.product_he || prod,
+        unit_type: result.unit_type || '',
+        results: (result.results || []).map(r => ({ ...r, shipping: r.shipping || '' }))
+      });
+    } catch(e) {
+      allProducts.push({ query: prod, product_he: prod, results: [], error: e.message });
+    }
+  }
+
+  hideStatus('statusUpload');
+
+  if (!allProducts.length) { showErr('errUpload', 'לא נמצאו תוצאות'); setBtn('searchIdentifiedBtn', false, 'חפש מחירים לכל המוצרים'); return; }
+
+  // Build combined structure like basket result (no recommendation - computed client-side)
+  const combined = { products: allProducts, recommendation: buildClientRecommendation(allProducts) };
+  renderBasketResults(combined, 'recBoxUpload','recStoreUpload','recTotalUpload','recSavingsUpload','recBreakdownUpload','recSummaryUpload','uploadResults');
+  setBtn('searchIdentifiedBtn', false, 'חפש מחירים לכל המוצרים');
+}
+
+function buildClientRecommendation(products) {
+  // Tally cheapest price per store across all products
+  const storeTotals = {};
+  for (const prod of products) {
+    let cheapest = null;
+    for (const r of (prod.results || [])) {
+      const p = r.packs?.[0]?.price ?? r.price ?? 999;
+      if (!cheapest || p < cheapest.price) cheapest = { store: r.store, price: p };
+    }
+    if (cheapest) {
+      if (!storeTotals[cheapest.store]) storeTotals[cheapest.store] = { total: 0, items: [] };
+      storeTotals[cheapest.store].total += cheapest.price;
+      storeTotals[cheapest.store].items.push({ product: prod.product_he, price: cheapest.price });
+    }
+  }
+  const sorted = Object.entries(storeTotals).sort((a,b) => a[1].total - b[1].total);
+  if (!sorted.length) return null;
+  const [bestStore, bestData] = sorted[0];
+  const maxTotal = sorted[sorted.length-1][1].total;
+  return {
+    store: bestStore,
+    total_products: bestData.total,
+    shipping_cost: 0,
+    total_with_shipping: bestData.total,
+    shipping_note: 'בדוק מדיניות משלוח',
+    savings_vs_expensive: maxTotal - bestData.total,
+    breakdown: bestData.items,
+    summary: `הזול ביותר לסל זה הוא ${bestStore} בסך ₪${bestData.total.toFixed(2)} (לפי המחיר הזול ביותר לכל מוצר)`
+  };
+}
+
+
+function showSingleInUpload(parsed, productName) {
+  const sorted = [...parsed.results].sort((a,b) => a.price - b.price);
+  const min = sorted[0].price;
+  let html = `<div class="basket-product-section"><div class="basket-product-header"><span class="basket-product-name">${esc(productName)}</span><span class="basket-product-best">₪${Number(min).toFixed(2)}</span></div>${sorted.map((r,i) => priceRowHtml(r,i,min,i===0)).join('')}`;
+  if (parsed.summary) html += `<div class="summary-box">${esc(parsed.summary)}</div>`;
+  html += '</div>';
+  document.getElementById('uploadResults').innerHTML = html;
+  document.getElementById('uploadResults').style.display = 'block';
+}
+
+// ---- SHARED API ----
+async function callClaude(key, system, userText, extraContentBlocks, useSearch) {
+  const userContent = [...extraContentBlocks, { type: 'text', text: userText }];
+  const body = {
+    model: 'claude-sonnet-4-5',
+    max_tokens: extraContentBlocks.length > 0 ? 1500 : 3000,
+    system,
+    messages: [{ role: 'user', content: userContent }]
+  };
+  // Add web search only for price queries, NOT for PDF/image analysis
+  if (useSearch || extraContentBlocks.length === 0) {
+    body.tools = [{ type: 'web_search_20250305', name: 'web_search' }];
+  }
+
+  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify(body)
+  });
+  if (!resp.ok) {
+    const e = await resp.json().catch(() => ({}));
+    throw new Error(e.error?.message || `שגיאת שרת ${resp.status}`);
+  }
+  const data = await resp.json();
+  let text = '';
+  for (const block of (data.content || [])) { if (block.type === 'text') text += block.text; }
+  console.log('API raw text:', text.substring(0, 500));
+  text = text.replace(/```json|```/g, '').trim();
+  text = text.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+  // Find the outermost JSON object
+  let start = text.indexOf('{');
+  if (start === -1) throw new Error('לא נמצא JSON בתשובה');
+  // Find matching closing brace
+  let depth = 0, end = -1;
+  for (let i = start; i < text.length; i++) {
+    if (text[i] === '{') depth++;
+    else if (text[i] === '}') { depth--; if (depth === 0) { end = i; break; } }
+  }
+  let jsonStr = end > -1 ? text.slice(start, end + 1) : text.slice(start);
+  try { return JSON.parse(jsonStr); } catch(e1) {
+    // Try progressive truncation to fix broken JSON
+    const lines = jsonStr.split('\n');
+    for (let cut = lines.length - 1; cut > lines.length / 2; cut--) {
+      let attempt = lines.slice(0, cut).join('\n');
+      attempt = attempt.replace(/,\s*$/, '');
+      const o = (attempt.match(/{/g)||[]).length - (attempt.match(/}/g)||[]).length;
+      const a = (attempt.match(/\[/g)||[]).length - (attempt.match(/\]/g)||[]).length;
+      for (let i=0;i<a;i++) attempt += ']';
+      for (let i=0;i<o;i++) attempt += '}';
+      try { const r = JSON.parse(attempt); console.log('Recovered JSON at line', cut); return r; } catch(e) {}
+    }
+    throw new Error('שגיאת עיבוד - נסה שוב (JSON פגום)');
+  }
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const dataUrl = e.target.result;
+      const base64 = dataUrl.split(',')[1];
+      resolve({ base64, mediaType: file.type });
+    };
+    reader.onerror = () => reject(new Error('שגיאה בקריאת הקובץ'));
+    reader.readAsDataURL(file);
+  });
+}
+
+// ---- UI HELPERS ----
+function priceRowHtml(r, i, minUnitPrice, isBest) {
+  // Support both old flat structure and new packs structure
+  const packs = r.packs && r.packs.length ? r.packs : [{
+    price: r.price, units: r.units, unit_price: r.unit_price,
+    pack_desc: r.pack_desc, url: r.url
+  }];
+  const bestPack = packs[0]; // already sorted by unit_price
+  const bestUnitPrice = bestPack.unit_price || 0;
+  const diff = (i > 0 && minUnitPrice > 0 && bestUnitPrice > 0)
+    ? (bestUnitPrice - minUnitPrice).toFixed(2) : null;
+
+  const packsHtml = packs.map((p, pi) => {
+    const url = p.url?.startsWith('http') ? p.url : '#';
+    const isPackBest = pi === 0;
+    return `<div class="pack-row ${isPackBest ? 'pack-best' : ''}">
+      <div class="pack-row-desc">${esc(p.pack_desc || (p.units ? p.units + " יח'" : ''))}</div>
+      <div class="pack-row-prices">
+        ${p.unit_price > 0 ? `<span class="pack-unit-p">₪${Number(p.unit_price).toFixed(2)}/יח'</span>` : ''}
+        <span class="pack-total-p">₪${Number(p.price).toFixed(2)}</span>
+        <a class="pack-link" href="${url}" target="_blank" rel="noopener">↗</a>
+      </div>
+    </div>`;
+  }).join('');
+
+  return `<div class="price-row-store ${isBest ? 'best' : ''}">
+    <div class="store-row-header">
+      <div class="rank-num ${isBest ? 'gold' : ''}">${isBest ? '★' : i+1}</div>
+      <div class="store-row-name">
+        ${isBest ? '<span class="badge-cheapest">הזול ליחידה</span>' : ''}
+        ${esc(r.store)}
+      </div>
+      <div class="store-best-unit">
+        ${bestUnitPrice > 0 ? `₪${Number(bestUnitPrice).toFixed(2)}/יח'` : `₪${Number(bestPack.price).toFixed(2)}`}
+        ${diff ? `<span class="unit-diff">+₪${diff}</span>` : ''}
+      </div>
+    </div>
+    <div class="packs-list">${packsHtml}</div>
+  </div>`;
+}
+
+
+function priceRowHtmlWithShipping(r, i, min, isBest) {
+  const diff = i > 0 ? (r.price - min).toFixed(2) : null;
+  const url = r.url?.startsWith('http') ? r.url : '#';
+  const shipping = r.shipping || '';
+  const hasUnits = r.units && r.units > 0 && r.unit_price && r.unit_price > 0;
+  const packDesc = r.pack_desc || (r.units ? r.units + " יח'" : '');
+  let shippingHtml = '';
+  if (shipping) {
+    const isFree = shipping.includes('חינם');
+    shippingHtml = `<span class="shipping-badge ${isFree ? 'free' : 'paid'}">${esc(shipping)}</span> `;
+  }
+  return `<div class="price-row ${isBest ? 'best' : ''}">
+    <div class="rank-num ${isBest ? 'gold' : ''}">${isBest ? '★' : i+1}</div>
+    <div class="row-info">
+      <div class="row-store">${isBest ? '<span class="badge-cheapest">הזול ליחידה</span>' : ''}${esc(r.store)}</div>
+      <div class="row-note">${shippingHtml}${packDesc ? `<span class="pack-desc">${esc(packDesc)}</span> ` : ''}${r.notes ? esc(r.notes) : ''}</div>
+    </div>
+    <div class="row-price">
+      ${hasUnits ? `<div class="unit-price-main">₪${Number(r.unit_price).toFixed(2)}<span class="unit-label">/יח'</span></div>` : `<div class="price-main">₪${Number(r.price).toFixed(2)}</div>`}
+      <div class="pack-price">${hasUnits ? `אריזה: ₪${Number(r.price).toFixed(2)}` : ''}</div>
+      ${diff ? `<div class="price-diff">+₪${diff}/יח'</div>` : ''}
+    </div>
+    <a class="row-link" href="${url}" target="_blank" rel="noopener">↗</a>
+  </div>`;
+}
+
+function showQuote() {
+  if (!lastBasketParsed) return;
+  const parsed = lastBasketParsed;
+  const storesShipping = parsed.stores_shipping || {};
+
+  // Build per-store totals
+  const storeTotals = {};
+  for (const prod of (parsed.products || [])) {
+    for (const r of (prod.results || [])) {
+      if (!storeTotals[r.store]) storeTotals[r.store] = { products: 0, items: [], shipping: r.shipping || storesShipping[r.store] || '' };
+      storeTotals[r.store].products += Number(r.price);
+      storeTotals[r.store].items.push({ name: prod.product_he || prod.query, price: Number(r.price), url: r.url });
+    }
+  }
+
+  // Estimate shipping cost per store
+  const storeRows = Object.entries(storeTotals).map(([store, data]) => {
+    const prodTotal = data.products;
+    const shippingStr = data.shipping || '';
+    let shippingCost = 0;
+    let shippingLabel = '';
+    let isFree = false;
+
+    if (shippingStr.includes('חינם תמיד') || shippingStr === 'חינם') {
+      shippingCost = 0; isFree = true; shippingLabel = 'משלוח חינם';
+    } else {
+      // Extract threshold number
+      const threshMatch = shippingStr.match(/חינם.*?(\d+)/);
+      const paidMatch = shippingStr.match(/(\d+).*?משלוח|משלוח.*?(\d+)/);
+      if (threshMatch) {
+        const thresh = Number(threshMatch[1]);
+        if (prodTotal >= thresh) { shippingCost = 0; isFree = true; shippingLabel = `משלוח חינם (מעל ₪${thresh})`; }
+        else { shippingCost = paidMatch ? Number(paidMatch[1]||paidMatch[2]||25) : 25; shippingLabel = `₪${shippingCost} משלוח (סף ₪${thresh})`; }
+      } else if (paidMatch) {
+        shippingCost = Number(paidMatch[1]||paidMatch[2]||25);
+        shippingLabel = `₪${shippingCost} משלוח`;
+      } else if (shippingStr) {
+        shippingLabel = shippingStr;
+      } else {
+        shippingLabel = 'משלוח - לא ידוע';
+      }
+    }
+
+    return { store, prodTotal, shippingCost, grandTotal: prodTotal + shippingCost, shippingLabel, isFree, items: data.items };
+  }).sort((a,b) => a.grandTotal - b.grandTotal);
+
+  if (!storeRows.length) return;
+  const cheapest = storeRows[0].grandTotal;
+
+  let html = '';
+  storeRows.forEach((row, i) => {
+    const isWinner = i === 0;
+    const savings = i > 0 ? (row.grandTotal - cheapest).toFixed(2) : null;
+    html += `<div class="quote-store-row ${isWinner ? 'winner' : ''}">
+      <div class="quote-rank ${isWinner ? 'gold' : ''}">${isWinner ? '★' : i+1}</div>
+      <div class="quote-store-info">
+        <div class="quote-store-name">${isWinner ? '<span class="badge-cheapest">הכי זול</span> ' : ''}${esc(row.store)}</div>
+        <div class="quote-shipping-note ${row.isFree ? 'shipping-free' : (row.shippingCost>0?'shipping-paid':'shipping-unknown')}">${esc(row.shippingLabel)}</div>
+      </div>
+      <div class="quote-totals">
+        <div class="quote-products-price">מוצרים: ₪${row.prodTotal.toFixed(2)}</div>
+        ${row.shippingCost > 0 ? `<div class="quote-shipping-price shipping-paid">+ ₪${row.shippingCost.toFixed(2)} משלוח</div>` : ''}
+        <div class="quote-grand-total">₪${row.grandTotal.toFixed(2)}</div>
+        ${savings ? `<span class="quote-savings-badge">+₪${savings}</span>` : ''}
+      </div>
+    </div>`;
+  });
+
+  document.getElementById('quoteStoreList').innerHTML = html;
+  document.getElementById('quoteDate').textContent = new Date().toLocaleDateString('he-IL');
+  document.getElementById('quoteFooter').textContent = `* מחירי משלוח משוערים - ייתכנו שינויים. מומלץ לאמת באתר החנות לפני רכישה.`;
+  document.getElementById('quoteBox').style.display = 'block';
+  document.getElementById('quoteBox').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function selectMode(mode) {
+  uploadMode = mode;
+  document.getElementById('modeInvoice').className = 'mode-btn' + (mode === 'invoice' ? ' selected' : '');
+  document.getElementById('modeProduct').className = 'mode-btn' + (mode === 'product' ? ' selected' : '');
+}
+
+function onDrag(e, over) {
+  e.preventDefault();
+  document.getElementById('uploadZone').className = 'upload-zone' + (over ? ' drag' : '');
+}
+
+function onDrop(e) {
+  e.preventDefault();
+  document.getElementById('uploadZone').className = 'upload-zone';
+  const file = e.dataTransfer.files[0];
+  if (file) handleFile(file);
+}
+
+function onFileSelected(e) {
+  const file = e.target.files[0];
+  if (file) handleFile(file);
+}
+
+function handleFile(file) {
+  const allowed = ['application/pdf','image/jpeg','image/png','image/webp','image/jpg'];
+  if (!allowed.includes(file.type)) { showErr('errUpload', 'סוג קובץ לא נתמך. השתמש ב-PDF, JPG, PNG או WEBP'); return; }
+  if (file.size > 20 * 1024 * 1024) { showErr('errUpload', 'הקובץ גדול מדי - מקסימום 20MB'); return; }
+  uploadedFile = file;
+  hideErr('errUpload');
+  document.getElementById('identifiedBox').style.display = 'none';
+  document.getElementById('recBoxUpload').style.display = 'none';
+  document.getElementById('uploadResults').style.display = 'none';
+
+  const preview = document.getElementById('previewBox');
+  document.getElementById('previewFilename').textContent = file.name;
+  document.getElementById('previewInfo').textContent = (file.size / 1024).toFixed(0) + ' KB - ' + (file.type === 'application/pdf' ? 'PDF' : 'תמונה');
+
+  const img = document.getElementById('previewImg');
+  if (file.type.startsWith('image/')) {
+    const reader = new FileReader();
+    reader.onload = e => { img.src = e.target.result; img.style.display = 'block'; };
+    reader.readAsDataURL(file);
+    // Auto-select product mode for images
+    selectMode('product');
+  } else {
+    img.style.display = 'none';
+    selectMode('invoice');
+  }
+
+  preview.style.display = 'block';
+  document.getElementById('detectMode').style.display = 'block';
+  document.getElementById('analyzeBtn').style.display = 'block';
+}
+
+function clearFile() {
+  uploadedFile = null;
+  document.getElementById('previewBox').style.display = 'none';
+  document.getElementById('detectMode').style.display = 'none';
+  document.getElementById('analyzeBtn').style.display = 'none';
+  document.getElementById('fileInput').value = '';
+  document.getElementById('identifiedBox').style.display = 'none';
+  document.getElementById('recBoxUpload').style.display = 'none';
+  document.getElementById('uploadResults').style.display = 'none';
+  hideErr('errUpload');
+}
+
+async function analyzeFile() {
+  if (!uploadedFile) return;
+  const key = getKey();
+  if (!key) { showErr('errUpload', 'יש להזין מפתח API תחילה'); return; }
+
+  setBtn('analyzeBtn', true, 'מנתח...');
+  hideErr('errUpload');
+  document.getElementById('identifiedBox').style.display = 'none';
+  showStatus('statusUpload', 'statusUploadText', uploadMode === 'invoice' ? 'מנתח חשבונית ומזהה מוצרים...' : 'מזהה מוצר מהתמונה...');
+
+  try {
+    const { base64, mediaType } = await fileToBase64(uploadedFile);
+    const isPdf = uploadedFile.type === 'application/pdf';
+    const system = uploadMode === 'invoice' ? SYSTEM_IDENTIFY_INVOICE : SYSTEM_IDENTIFY_PRODUCT;
+    const userText = uploadMode === 'invoice' ? 'זהה את המוצרים בחשבונית זו' : 'זהה את המוצר בתמונה זו';
+
+    const contentBlock = isPdf
+      ? { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } }
+      : { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } };
+
+    const parsed = await callClaude(key, system, userText, [contentBlock], false);
+
+    if (parsed.error) throw new Error(parsed.error);
+
+    if (uploadMode === 'invoice') {
+      if (!parsed.products?.length) throw new Error('לא זוהו מוצרים בחשבונית');
+      identifiedProducts = parsed.products;
+      showIdentified(parsed);
+    } else {
+      // product image - go straight to search
+      const searchQ = parsed.search_query || parsed.product_he || parsed.product_en;
+      if (!searchQ) throw new Error('לא ניתן לזהות את המוצר');
+      identifiedProducts = [searchQ];
+      showStatus('statusUpload', 'statusUploadText', `זוהה: ${parsed.product_he || parsed.product_en} - מחפש מחיר...`);
+      const priceResult = await callClaude(key, SYSTEM_SINGLE, `חפש מחיר הכי זול בישראל: ${searchQ}`, [], true);
+      hideStatus('statusUpload');
+      if (!priceResult.results?.length) throw new Error('לא נמצאו מחירים');
+      // Show in single tab style inside upload tab
+      showSingleInUpload(priceResult, parsed.product_he || searchQ);
+    }
+  } catch(e) { showErr('errUpload', e.message); }
+
+  hideStatus('statusUpload');
+  setBtn('analyzeBtn', false, 'זהה וחפש');
+}
+
+function showIdentified(parsed) {
+  const box = document.getElementById('identifiedBox');
+  document.getElementById('identifiedTitle').textContent =
+    `זוהו ${parsed.products.length} מוצרים${parsed.store_name ? ' מ' + parsed.store_name : ''}${parsed.purchase_date ? ' (' + parsed.purchase_date + ')' : ''}:`;
+  document.getElementById('identifiedList').innerHTML = parsed.products.map(p =>
+    `<div class="identified-item"><span class="identified-check">✓</span><span class="identified-item-name">${esc(p)}</span></div>`
+  ).join('');
+  box.style.display = 'block';
+}
+
+async function searchIdentified() {
+  if (!identifiedProducts.length) return;
+  const key = getKey();
+  if (!key) { showErr('errUpload', 'יש להזין מפתח API'); return; }
+  setBtn('searchIdentifiedBtn', true, 'מחפש...');
+  document.getElementById('recBoxUpload').style.display = 'none';
+  document.getElementById('uploadResults').style.display = 'none';
+  showStatus('statusUpload', 'statusUploadText', `מחפש מחירים ל-${identifiedProducts.length} מוצרים...`);
+  try {
+    const prompt = `חפש מחירים לסל:\n${identifiedProducts.map((b,i) => `${i+1}. ${b}`).join('\n')}`;
+    const parsed = await callClaude(key, SYSTEM_BASKET, prompt, [], true);
+    if (!parsed.products?.length) throw new Error('לא נמצאו תוצאות');
+    renderBasketResults(parsed,'recBoxUpload','recStoreUpload','recTotalUpload','recSavingsUpload','recBreakdownUpload','recSummaryUpload','uploadResults');
+  } catch(e) { showErr('errUpload', e.message); }
+  hideStatus('statusUpload');
+  setBtn('searchIdentifiedBtn', false, 'חפש מחירים לכל המוצרים');
+}
+
+function showSingleInUpload(parsed, productName) {
+  const sorted = [...parsed.results].sort((a,b) => a.price - b.price);
+  const min = sorted[0].price;
+  let html = `<div class="basket-product-section"><div class="basket-product-header"><span class="basket-product-name">${esc(productName)}</span><span class="basket-product-best">₪${Number(min).toFixed(2)}</span></div>${sorted.map((r,i) => priceRowHtml(r,i,min,i===0)).join('')}`;
+  if (parsed.summary) html += `<div class="summary-box">${esc(parsed.summary)}</div>`;
+  html += '</div>';
+  document.getElementById('uploadResults').innerHTML = html;
+  document.getElementById('uploadResults').style.display = 'block';
+}
+
+// ---- SHARED API ----
+async function callClaude(key, system, userText, extraContentBlocks, useSearch) {
+  const userContent = [...extraContentBlocks, { type: 'text', text: userText }];
+  const body = {
+    model: 'claude-sonnet-4-5',
+    max_tokens: extraContentBlocks.length > 0 ? 1500 : 3000,
+    system,
+    messages: [{ role: 'user', content: userContent }]
+  };
+  // Add web search only for price queries, NOT for PDF/image analysis
+  if (useSearch || extraContentBlocks.length === 0) {
+    body.tools = [{ type: 'web_search_20250305', name: 'web_search' }];
+  }
+
+  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify(body)
+  });
+  if (!resp.ok) {
+    const e = await resp.json().catch(() => ({}));
+    throw new Error(e.error?.message || `שגיאת שרת ${resp.status}`);
+  }
+  const data = await resp.json();
+  let text = '';
+  for (const block of (data.content || [])) { if (block.type === 'text') text += block.text; }
+  text = text.replace(/```json|```/g, '').trim();
+  text = text.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+  // Find the outermost JSON object
+  let start = text.indexOf('{');
+  if (start === -1) throw new Error('לא נמצא JSON בתשובה');
+  // Find matching closing brace
+  let depth = 0, end = -1;
+  for (let i = start; i < text.length; i++) {
+    if (text[i] === '{') depth++;
+    else if (text[i] === '}') { depth--; if (depth === 0) { end = i; break; } }
+  }
+  let jsonStr = end > -1 ? text.slice(start, end + 1) : text.slice(start);
+  try { return JSON.parse(jsonStr); } catch(e1) {
+    // Try progressive truncation to fix broken JSON
+    const lines = jsonStr.split('\n');
+    for (let cut = lines.length - 1; cut > lines.length / 2; cut--) {
+      let attempt = lines.slice(0, cut).join('\n');
+      attempt = attempt.replace(/,\s*$/, '');
+      const o = (attempt.match(/{/g)||[]).length - (attempt.match(/}/g)||[]).length;
+      const a = (attempt.match(/\[/g)||[]).length - (attempt.match(/\]/g)||[]).length;
+      for (let i=0;i<a;i++) attempt += ']';
+      for (let i=0;i<o;i++) attempt += '}';
+      try { const r = JSON.parse(attempt); console.log('Recovered JSON at line', cut); return r; } catch(e) {}
+    }
+    throw new Error('שגיאת עיבוד - נסה שוב (JSON פגום)');
+  }
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const dataUrl = e.target.result;
+      const base64 = dataUrl.split(',')[1];
+      resolve({ base64, mediaType: file.type });
+    };
+    reader.onerror = () => reject(new Error('שגיאה בקריאת הקובץ'));
+    reader.readAsDataURL(file);
+  });
+}
+
+// ---- UI HELPERS ----
+function priceRowHtml(r, i, min, isBest) {
+  const diff = i > 0 ? (r.price - min).toFixed(2) : null;
+  const url = r.url?.startsWith('http') ? r.url : '#';
+  const hasUnits = r.units && r.units > 0 && r.unit_price && r.unit_price > 0;
+  const packDesc = r.pack_desc || (r.units ? r.units + ' יח' : '');
+  return `<div class="price-row ${isBest ? 'best' : ''}">
+    <div class="rank-num ${isBest ? 'gold' : ''}">${isBest ? '★' : i+1}</div>
+    <div class="row-info">
+      <div class="row-store">${isBest ? '<span class="badge-cheapest">הזול ליחידה</span>' : ''}${esc(r.store)}</div>
+      <div class="row-note">${packDesc ? `<span class="pack-desc">${esc(packDesc)}</span>` : ''}${r.notes ? ' ' + esc(r.notes) : ''}</div>
+    </div>
+    <div class="row-price">
+      ${hasUnits ? `<div class="unit-price-main">₪${Number(r.unit_price).toFixed(2)}<span class="unit-label">/יח'</span></div>` : `<div class="price-main">₪${Number(r.price).toFixed(2)}</div>`}
+      <div class="pack-price">${hasUnits ? `אריזה: ₪${Number(r.price).toFixed(2)}` : ''}</div>
+      ${diff ? `<div class="price-diff">+₪${diff}/יח'</div>` : ''}
+    </div>
+    <a class="row-link" href="${url}" target="_blank" rel="noopener">↗</a>
+  </div>`;
+}
+
+function showStatus(boxId, textId, msg) { document.getElementById(boxId).style.display = 'flex'; document.getElementById(textId).textContent = msg; }
+function hideStatus(boxId) { document.getElementById(boxId).style.display = 'none'; }
+function showErr(id, msg) { const el = document.getElementById(id); el.style.display = 'block'; el.textContent = '⚠ ' + msg; }
+function hideErr(id) { document.getElementById(id).style.display = 'none'; }
+function setBtn(id, disabled, label) { const b = document.getElementById(id); b.disabled = disabled; b.textContent = label; }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('query').addEventListener('keydown', e => { if (e.key === 'Enter') doSingleSearch(); });
+  document.getElementById('basketInput').addEventListener('keydown', e => { if (e.key === 'Enter') addToBasket(); });
+});
+</script>
+</body>
+</html>
